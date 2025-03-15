@@ -1,3 +1,6 @@
+console.log('Main script loaded');
+console.log('THREE.js version:', THREE.REVISION);
+
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     // Scene setup
@@ -20,12 +23,14 @@ starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVerti
 const starMaterial = new THREE.PointsMaterial({ color: 0xFFFFFF });
 const stars = new THREE.Points(starGeometry, starMaterial);
 scene.add(stars);
+console.log('Stars added:', stars);
 
 // Create spaceship
 const shipGeometry = new THREE.BoxGeometry(2, 1, 3);
 const shipMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 const spaceship = new THREE.Mesh(shipGeometry, shipMaterial);
 scene.add(spaceship);
+console.log('Spaceship added:', spaceship);
 
 // Position camera behind spaceship
 camera.position.set(0, 2, -10);
@@ -60,6 +65,7 @@ window.addEventListener('mousemove', (e) => {
 
 // Animation loop
 function animate() {
+    console.log('Animation frame running');
     requestAnimationFrame(animate);
 
     // Spaceship movement
