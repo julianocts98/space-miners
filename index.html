@@ -43,12 +43,24 @@
 </head>
 <body>
     <div id="debugInfo"></div>
-    <div id="crosshair" style="
+    <div id="fixedCrosshair" style="
         position: fixed;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         color: white;
+        font-size: 24px;
+        pointer-events: none;
+        display: none;
+        font-family: Arial;
+        text-shadow: 0 0 5px rgba(255,0,0,0.7);
+    ">+</div>
+    <div id="floatingCrosshair" style="
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: cyan;
         font-size: 24px;
         pointer-events: none;
         display: none;

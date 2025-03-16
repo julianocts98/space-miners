@@ -11,7 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const resumeBtn = document.getElementById('resumeBtn');
     const quitBtn = document.getElementById('quitBtn');
     const crosshair = document.getElementById('crosshair');
-    let deltaX = 0, deltaY = 0;
+    let crosshairOffsetX = 0;
+    let crosshairOffsetY = 0;
+    const maxCrosshairOffset = 100; // pixels from center
     
     // Scene setup
 const scene = new THREE.Scene();
@@ -82,8 +84,22 @@ window.addEventListener('keyup', (e) => {
 
 window.addEventListener('mousemove', (e) => {
     if (!mouseLocked) return;
-    deltaX = e.movementX;  // Direct assignment instead of +=
-    deltaY = e.movementY;  // for immediate response
+    
+    // Update crosshair position with mouse movement
+    crosshairOffsetX += e.movementX;
+    crosshairOffsetY += e.movementY;
+
+    // Clamp to circular boundary
+    const currentDistance = Math.sqrt(crosshairOffsetX ** 2 + crosshairOffsetY ** 2);
+    if (currentDistance > maxCrosshairOffset) {
+        const scale = maxCrosshairOffset / currentDistance;
+        crosshairOffsetX *= scale;
+        crosshairOffsetY *= scale;
+    }
+
+    // Update floating crosshair position
+    const floatingCrosshair = document.getElementById('floatingCrosshair');
+    floatingCrosshair.style.transform = `translate(calc(${crosshairOffsetX}px - 50%), calc(${crosshairOffsetY}px - 50%)`;
 });
 
 // Pointer lock controls
@@ -96,7 +112,8 @@ renderer.domElement.addEventListener('click', () => {
 // Pointer lock change handlers
 document.addEventListener('pointerlockchange', () => {
     mouseLocked = document.pointerLockElement === renderer.domElement;
-    crosshair.style.display = mouseLocked ? 'block' : 'none';
+    document.getElementById('fixedCrosshair').style.display = mouseLocked ? 'block' : 'none';
+    document.getElementById('floatingCrosshair').style.display = mouseLocked ? 'block' : 'none';
     document.body.style.cursor = 'none';
 });
 

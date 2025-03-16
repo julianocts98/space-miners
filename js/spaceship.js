@@ -61,7 +61,7 @@ class Spaceship extends THREE.Mesh {
         this.position.add(this.velocity);
     }
 
-    handleRotation(keys, deltaX, deltaY, mouseLocked) {
+    handleRotation(keys, mouseLocked) {
         // Roll controls
         if (keys.q) this.rotationVelocity.z += this.rollAcceleration;
         if (keys.e) this.rotationVelocity.z -= this.rollAcceleration;
@@ -69,15 +69,18 @@ class Spaceship extends THREE.Mesh {
         // Apply rotational damping
         this.rotationVelocity.multiplyScalar(this.rotationDamping);
 
-        // Mouse rotation
+        // Mouse rotation based on crosshair offset
         if (mouseLocked) {
-            const sensitivity = 0.002;
+            const sensitivity = 0.0005; // Reduced sensitivity for smoother tracking
             const minVertical = -Math.PI/3;
             const maxVertical = Math.PI/3;
-            
-            // Apply mouse movement to rotation velocities
-            this.rotationVelocity.y -= deltaX * sensitivity;
-            this.rotationVelocity.x -= deltaY * sensitivity;
+
+            // Calculate rotation based on crosshair offset
+            const rotationY = (-crosshairOffsetX / maxCrosshairOffset) * sensitivity;
+            const rotationX = (-crosshairOffsetY / maxCrosshairOffset) * sensitivity;
+
+            this.rotationVelocity.y += rotationY;
+            this.rotationVelocity.x += rotationX;
 
             // Clamp vertical rotation
             const currentEuler = new THREE.Euler().setFromQuaternion(this.quaternion, 'YXZ');
