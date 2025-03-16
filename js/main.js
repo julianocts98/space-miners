@@ -124,6 +124,12 @@ document.addEventListener('pointerlockchange', () => {
     document.getElementById('fixedCrosshair').style.display = mouseLocked ? 'block' : 'none';
     document.getElementById('floatingCrosshair').style.display = mouseLocked ? 'block' : 'none';
     document.body.style.cursor = mouseLocked ? 'none' : 'default';
+    
+    // Add these lines to handle pause state
+    if (!mouseLocked) {
+        paused = true;
+        menu.style.display = 'block';
+    }
 });
 
 document.addEventListener('pointerlockerror', () => {
@@ -133,10 +139,6 @@ document.addEventListener('pointerlockerror', () => {
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         document.exitPointerLock();
-        paused = true;
-        mouseLocked = false;
-        menu.style.display = 'block';
-        document.body.style.cursor = 'default';
     }
 });
 
