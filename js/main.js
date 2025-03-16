@@ -148,7 +148,7 @@ function animate() {
     if (paused) return;
 
     spaceship.handleMovement(keys);
-    spaceship.handleRotation(keys, deltaX, deltaY, mouseLocked);
+    spaceship.handleRotation(keys, mouseLocked);
     spaceship.updateCamera(camera);
     
     if (debugMode) {
@@ -166,10 +166,6 @@ function animate() {
                 ).join('<br>')}
         `;
     }
-    
-    // Keep mouse deltas until next frame
-    deltaX *= 0.3;  // Add slight persistence
-    deltaY *= 0.3;  // for smoother movement
     
     renderer.render(scene, camera);
 }
