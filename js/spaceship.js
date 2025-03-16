@@ -61,7 +61,7 @@ class Spaceship extends THREE.Mesh {
         this.position.add(this.velocity);
     }
 
-    handleRotation(keys, mouseLocked, crosshairOffsetX, crosshairOffsetY, maxCrosshairOffset) {
+    handleRotation(keys, mouseLocked, crosshairOffsetX, crosshairOffsetY) {
         // Roll controls
         if (keys.q) this.rotationVelocity.z += this.rollAcceleration;
         if (keys.e) this.rotationVelocity.z -= this.rollAcceleration;
@@ -71,13 +71,13 @@ class Spaceship extends THREE.Mesh {
 
         // Mouse rotation based on crosshair offset
         if (mouseLocked) {
-            const sensitivity = 0.0005; // Reduced sensitivity for smoother tracking
+            const sensitivity = 0.0001; // Adjusted sensitivity
             const minVertical = -Math.PI/3;
             const maxVertical = Math.PI/3;
 
-            // Calculate rotation based on crosshair offset
-            const rotationY = (-crosshairOffsetX / maxCrosshairOffset) * sensitivity;
-            const rotationX = (-crosshairOffsetY / maxCrosshairOffset) * sensitivity;
+            // Calculate rotation based on actual mouse offset
+            const rotationY = -crosshairOffsetX * sensitivity;
+            const rotationX = -crosshairOffsetY * sensitivity;
 
             this.rotationVelocity.y += rotationY;
             this.rotationVelocity.x += rotationX;

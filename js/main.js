@@ -1,6 +1,11 @@
 console.log('Main script loaded');
 console.log('THREE.js version:', THREE.REVISION);
 
+// Helper function
+function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+}
+
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     let mouseLocked = false;
@@ -89,17 +94,17 @@ window.addEventListener('mousemove', (e) => {
     crosshairOffsetX += e.movementX;
     crosshairOffsetY += e.movementY;
 
-    // Clamp to circular boundary
-    const currentDistance = Math.sqrt(crosshairOffsetX ** 2 + crosshairOffsetY ** 2);
-    if (currentDistance > maxCrosshairOffset) {
-        const scale = maxCrosshairOffset / currentDistance;
-        crosshairOffsetX *= scale;
-        crosshairOffsetY *= scale;
-    }
-
+    // Keep crosshair within screen bounds (100px buffer for crosshair size)
+    const screenEdgeX = window.innerWidth/2 - 20;
+    const screenEdgeY = window.innerHeight/2 - 20;
+    
     // Update floating crosshair position
     const floatingCrosshair = document.getElementById('floatingCrosshair');
-    floatingCrosshair.style.transform = `translate(calc(${crosshairOffsetX}px - 50%), calc(${crosshairOffsetY}px - 50%)`;
+    floatingCrosshair.style.transform = `
+        translate(
+            calc(clamp(${crosshairOffsetX}px, -${screenEdgeX}px, ${screenEdgeX}px) - 50%), 
+            calc(clamp(${crosshairOffsetY}px, -${screenEdgeY}px, ${screenEdgeY}px) - 50%)
+    `;
 });
 
 // Pointer lock controls
@@ -154,7 +159,7 @@ function animate() {
     if (paused) return;
 
     spaceship.handleMovement(keys);
-    spaceship.handleRotation(keys, mouseLocked, crosshairOffsetX, crosshairOffsetY, maxCrosshairOffset);
+    spaceship.handleRotation(keys, mouseLocked, crosshairOffsetX, crosshairOffsetY);
     spaceship.updateCamera(camera);
     
     if (debugMode) {
