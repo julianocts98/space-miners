@@ -6,6 +6,7 @@ class Spaceship extends THREE.Mesh {
         
         this.velocity = new THREE.Vector3();
         this.rotationVelocity = new THREE.Vector3();
+        this.maxRotationSpeed = 0.02; // Added maximum rotation speed
         
         // Add debug vectors
         this.velocityArrow = new THREE.ArrowHelper(
@@ -71,16 +72,21 @@ class Spaceship extends THREE.Mesh {
 
         // Mouse rotation based on crosshair offset
         if (mouseLocked) {
-            const sensitivity = 0.0001; // Adjusted sensitivity
+            const sensitivity = 0.00002; // Greatly reduced sensitivity
+            const smoothing = 0.1; // Increased smoothing
             const minVertical = -Math.PI/3;
             const maxVertical = Math.PI/3;
 
-            // Calculate rotation based on actual mouse offset
-            const rotationY = -crosshairOffsetX * sensitivity;
-            const rotationX = -crosshairOffsetY * sensitivity;
+            // Calculate target rotation with reduced sensitivity
+            const targetRotationY = -crosshairOffsetX * sensitivity;
+            const targetRotationX = -crosshairOffsetY * sensitivity;
 
-            this.rotationVelocity.y += rotationY;
-            this.rotationVelocity.x += rotationX;
+            // Apply smoothing and clamp to max rotation speed
+            this.rotationVelocity.y += (targetRotationY - this.rotationVelocity.y) * smoothing;
+            this.rotationVelocity.x += (targetRotationX - this.rotationVelocity.x) * smoothing;
+            
+            // Clamp rotation speed
+            this.rotationVelocity.clampLength(0, this.maxRotationSpeed);
 
             // Clamp vertical rotation
             const currentEuler = new THREE.Euler().setFromQuaternion(this.quaternion, 'YXZ');
