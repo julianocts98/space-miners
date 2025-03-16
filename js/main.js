@@ -123,7 +123,7 @@ document.addEventListener('pointerlockchange', () => {
     mouseLocked = document.pointerLockElement === renderer.domElement;
     document.getElementById('fixedCrosshair').style.display = mouseLocked ? 'block' : 'none';
     document.getElementById('floatingCrosshair').style.display = mouseLocked ? 'block' : 'none';
-    document.body.style.cursor = 'none';
+    document.body.style.cursor = mouseLocked ? 'none' : 'default';
 });
 
 document.addEventListener('pointerlockerror', () => {
@@ -136,6 +136,7 @@ document.addEventListener('keydown', (e) => {
         paused = true;
         mouseLocked = false;
         menu.style.display = 'block';
+        document.body.style.cursor = 'default';
     }
 });
 
