@@ -1,0 +1,68 @@
+body { 
+    margin: 0; 
+    overflow: hidden; 
+}
+
+canvas { 
+    display: block; 
+}
+
+#debugInfo {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    color: white;
+    font-family: monospace;
+    background: rgba(0,0,0,0.7);
+    padding: 10px;
+    display: none;
+}
+
+#crosshair {
+    color: white;
+    text-shadow: 0 0 3px black;
+    font-size: 24px;
+}
+
+#menu {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.8);
+    padding: 20px;
+    color: white;
+    text-align: center;
+}
+
+#menu button {
+    padding: 10px 20px;
+    margin: 5px;
+}
+
+#fixedCrosshair {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 24px;
+    pointer-events: none;
+    display: none;
+    font-family: Arial;
+    text-shadow: 0 0 5px rgba(255,0,0,0.7);
+}
+
+#floatingCrosshair {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: cyan;
+    font-size: 24px;
+    pointer-events: none;
+    display: none;
+    font-family: Arial;
+    text-shadow: 0 0 5px rgba(0,255,255,0.7);
+}

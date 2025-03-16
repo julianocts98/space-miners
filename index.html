@@ -4,69 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Space Adventure</title>
-    <style>
-        body { margin: 0; overflow: hidden; }
-        canvas { display: block; }
-        /* Add debug info display */
-        #debugInfo {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            color: white;
-            font-family: monospace;
-            background: rgba(0,0,0,0.7);
-            padding: 10px;
-            display: none;
-        }
-        /* Add this */
-        #crosshair {
-            color: white;
-            text-shadow: 0 0 3px black;
-            font-size: 24px;
-        }
-        #menu {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.8);
-            padding: 20px;
-            color: white;
-            text-align: center;
-        }
-        #menu button {
-            padding: 10px 20px;
-            margin: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body tabindex="0">
     <div id="debugInfo"></div>
-    <div id="fixedCrosshair" style="
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: white;
-        font-size: 24px;
-        pointer-events: none;
-        display: none;
-        font-family: Arial;
-        text-shadow: 0 0 5px rgba(255,0,0,0.7);
-    ">+</div>
-    <div id="floatingCrosshair" style="
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: cyan;
-        font-size: 24px;
-        pointer-events: none;
-        display: none;
-        font-family: Arial;
-        text-shadow: 0 0 5px rgba(0,255,255,0.7);
-    ">✧</div>
+    <div id="fixedCrosshair">+</div>
+    <div id="floatingCrosshair">✧</div>
     <div id="menu">
         <h2>PAUSED</h2>
         <button id="resumeBtn">Resume</button>
