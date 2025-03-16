@@ -28,54 +28,72 @@ class Spaceship extends THREE.Mesh {
         this.forwardArrow.visible = false;
         this.maxSpeed = 2.0;
         this.acceleration = 0.04;
+        this.strafeAcceleration = this.acceleration * 0.7;
         this.rotationAcceleration = 0.0008;
-        this.damping = 1.0;
+        this.rollAcceleration = 0.0015;
+        this.damping = 0.98;
         this.rotationDamping = 0.95;
+        this.boostMultiplier = 2.0;
     }
 
     handleMovement(keys) {
-        const forward = new THREE.Vector3(0, 0, -1);
-        forward.applyQuaternion(this.quaternion);
+        const boost = keys.shift ? this.boostMultiplier : 1;
+        const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.quaternion);
+        const right = new THREE.Vector3(1, 0, 0).applyQuaternion(this.quaternion);
 
-        if (keys.w) {
-            this.velocity.add(forward.multiplyScalar(this.acceleration));
-        }
-        if (keys.s) {
-            this.velocity.add(forward.multiplyScalar(-this.acceleration * 0.3));
-        }
+        // Apply damping first
+        this.velocity.multiplyScalar(this.damping);
 
-        if (this.velocity.length() > this.maxSpeed) {
-            this.velocity.normalize().multiplyScalar(this.maxSpeed);
+        // Forward/backward thrust
+        if (keys.w) this.velocity.add(forward.multiplyScalar(this.acceleration * boost));
+        if (keys.s) this.velocity.add(forward.multiplyScalar(-this.acceleration * 0.5 * boost));
+
+        // Strafing
+        if (keys.a) this.velocity.add(right.multiplyScalar(-this.strafeAcceleration * boost));
+        if (keys.d) this.velocity.add(right.multiplyScalar(this.strafeAcceleration * boost));
+
+        // Clamp velocity
+        const currentMaxSpeed = this.maxSpeed * (boost > 1 ? 1.5 : 1);
+        if (this.velocity.length() > currentMaxSpeed) {
+            this.velocity.normalize().multiplyScalar(currentMaxSpeed);
         }
 
         this.position.add(this.velocity);
     }
 
     handleRotation(keys, deltaX, deltaY, mouseLocked) {
-        if (keys.a) this.rotationVelocity.y += this.rotationAcceleration;
-        if (keys.d) this.rotationVelocity.y -= this.rotationAcceleration;
+        // Roll controls
+        if (keys.q) this.rotationVelocity.z += this.rollAcceleration;
+        if (keys.e) this.rotationVelocity.z -= this.rollAcceleration;
+        
+        // Apply rotational damping
         this.rotationVelocity.multiplyScalar(this.rotationDamping);
-        this.rotateY(this.rotationVelocity.y);
 
+        // Mouse rotation
         if (mouseLocked) {
             const sensitivity = 0.002;
             const minVertical = -Math.PI/3;
             const maxVertical = Math.PI/3;
             
-            const deltaQuaternion = new THREE.Quaternion()
-                .setFromEuler(new THREE.Euler(
-                    -deltaY * sensitivity,
-                    -deltaX * sensitivity,
-                    0,
-                    'YXZ'
-                ));
-            
-            this.quaternion.multiply(deltaQuaternion);
-            
+            // Apply mouse movement to rotation velocities
+            this.rotationVelocity.y -= deltaX * sensitivity;
+            this.rotationVelocity.x -= deltaY * sensitivity;
+
+            // Clamp vertical rotation
             const currentEuler = new THREE.Euler().setFromQuaternion(this.quaternion, 'YXZ');
             currentEuler.x = THREE.MathUtils.clamp(currentEuler.x, minVertical, maxVertical);
             this.quaternion.setFromEuler(currentEuler);
         }
+
+        // Apply accumulated rotations
+        const deltaQuaternion = new THREE.Quaternion()
+            .setFromEuler(new THREE.Euler(
+                this.rotationVelocity.x,
+                this.rotationVelocity.y,
+                this.rotationVelocity.z,
+                'YXZ'
+            ));
+        this.quaternion.multiply(deltaQuaternion);
     }
 
     updateCamera(camera) {

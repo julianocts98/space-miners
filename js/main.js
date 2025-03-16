@@ -48,7 +48,7 @@ camera.position.set(0, 2, -10);
 camera.lookAt(spaceship.position);
 
 // Movement keys
-const keys = { w: false, a: false, s: false, d: false };
+const keys = { w: false, a: false, s: false, d: false, q: false, e: false, shift: false };
 
 
 // Event listeners
@@ -57,6 +57,9 @@ window.addEventListener('keydown', (e) => {
     if (e.key === 's') keys.s = true;
     if (e.key === 'a') keys.a = true;
     if (e.key === 'd') keys.d = true;
+    if (e.key === 'q') keys.q = true;
+    if (e.key === 'e') keys.e = true;
+    if (e.key === 'Shift') keys.shift = true;
     
     if (e.key === 'm') {
         e.preventDefault(); // Add this line
@@ -72,6 +75,9 @@ window.addEventListener('keyup', (e) => {
     if (e.key === 's') keys.s = false;
     if (e.key === 'a') keys.a = false;
     if (e.key === 'd') keys.d = false;
+    if (e.key === 'q') keys.q = false;
+    if (e.key === 'e') keys.e = false;
+    if (e.key === 'Shift') keys.shift = false;
 });
 
 window.addEventListener('mousemove', (e) => {
