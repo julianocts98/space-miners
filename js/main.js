@@ -3,6 +3,12 @@ console.log('THREE.js version:', THREE.REVISION);
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
+    let mouseLocked = false;
+    let paused = false;
+    const menu = document.getElementById('menu');
+    const resumeBtn = document.getElementById('resumeBtn');
+    const quitBtn = document.getElementById('quitBtn');
+    
     // Scene setup
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -59,14 +65,46 @@ window.addEventListener('keyup', (e) => {
 });
 
 window.addEventListener('mousemove', (e) => {
+    if (!mouseLocked) return;
     mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 });
 
+// Add these event listeners after the existing ones
+renderer.domElement.addEventListener('click', () => {
+    if (!mouseLocked && !paused) {
+        mouseLocked = true;
+        document.body.classList.add('crosshair');
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        paused = true;
+        mouseLocked = false;
+        menu.style.display = 'block';
+        document.body.classList.remove('crosshair');
+    }
+});
+
+resumeBtn.addEventListener('click', () => {
+    paused = false;
+    mouseLocked = true;
+    menu.style.display = 'none';
+    document.body.classList.add('crosshair');
+});
+
+quitBtn.addEventListener('click', () => {
+    window.location.reload();
+});
+
 // Animation loop
 function animate() {
-    console.log('Animation frame running');
     requestAnimationFrame(animate);
+    
+    if (paused) return;
+    
+    console.log('Animation frame running');
 
     // Spaceship movement
     if (keys.w) spaceship.translateZ(-moveSpeed);

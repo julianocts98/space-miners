@@ -7,9 +7,31 @@
     <style>
         body { margin: 0; }
         canvas { display: block; }
+        /* Add these */
+        .crosshair { cursor: crosshair; }
+        #menu {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+        #menu button {
+            padding: 10px 20px;
+            margin: 5px;
+        }
     </style>
 </head>
 <body>
+    <div id="menu">
+        <h2>PAUSED</h2>
+        <button id="resumeBtn">Resume</button>
+        <button id="quitBtn">Quit</button>
+    </div>
     <script src="https://unpkg.com/three@0.146.0/build/three.min.js"></script>
     <script src="js/main.js"></script>
 </body>
