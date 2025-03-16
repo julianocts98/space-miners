@@ -105,7 +105,11 @@ window.addEventListener('mousemove', (e) => {
 // Pointer lock controls
 renderer.domElement.addEventListener('click', () => {
     if (!mouseLocked && !paused) {
-        renderer.domElement.requestPointerLock();
+        renderer.domElement.requestPointerLock()
+            .catch(err => {
+                console.error('Error requesting pointer lock:', err);
+                alert('Click the game view to lock controls!');
+            });
     }
 });
 
@@ -132,9 +136,11 @@ document.addEventListener('keydown', (e) => {
 
 resumeBtn.addEventListener('click', () => {
     paused = false;
-    mouseLocked = true;
     menu.style.display = 'none';
-    document.body.classList.add('crosshair');
+    renderer.domElement.requestPointerLock()
+        .catch(err => {
+            console.error('Error resuming pointer lock:', err);
+        });
 });
 
 quitBtn.addEventListener('click', () => {
@@ -148,7 +154,7 @@ function animate() {
     if (paused) return;
 
     spaceship.handleMovement(keys);
-    spaceship.handleRotation(keys, mouseLocked);
+    spaceship.handleRotation(keys, mouseLocked, crosshairOffsetX, crosshairOffsetY);
     spaceship.updateCamera(camera);
     
     if (debugMode) {

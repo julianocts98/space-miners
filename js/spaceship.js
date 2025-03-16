@@ -61,7 +61,7 @@ class Spaceship extends THREE.Mesh {
         this.position.add(this.velocity);
     }
 
-    handleRotation(keys, mouseLocked) {
+    handleRotation(keys, mouseLocked, crosshairOffsetX, crosshairOffsetY) {
         // Roll controls
         if (keys.q) this.rotationVelocity.z += this.rollAcceleration;
         if (keys.e) this.rotationVelocity.z -= this.rollAcceleration;
