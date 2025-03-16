@@ -42,10 +42,11 @@ class Spaceship extends THREE.Mesh {
         
         this.velocity = new THREE.Vector3();
         this.rotationVelocity = new THREE.Vector3();
-        this.maxSpeed = 0.5;
-        this.acceleration = 0.02;
+        this.maxSpeed = 2.0;  // Increased from 0.5
+        this.acceleration = 0.04;  // Increased from 0.02
         this.rotationAcceleration = 0.0008;
-        this.damping = 0.98;
+        this.damping = 1.0;  // Changed from 0.98 (no friction in space)
+        this.rotationDamping = 0.95;  // New separate rotation damping
     }
 
     handleMovement(keys) {
@@ -53,16 +54,13 @@ class Spaceship extends THREE.Mesh {
         if (keys.w) this.velocity.z -= this.acceleration;
         if (keys.s) this.velocity.z += this.acceleration * 0.5;
 
-        // Apply velocity damping
-        this.velocity.multiplyScalar(this.damping);
-        
-        // Clamp maximum speed
-        if (this.velocity.length() > this.maxSpeed) {
+        // Clamp maximum speed using actual velocity vector
+        if (this.velocity.lengthSq() > this.maxSpeed * this.maxSpeed) {
             this.velocity.normalize().multiplyScalar(this.maxSpeed);
         }
 
-        // Apply movement
-        this.translateZ(this.velocity.z);
+        // Apply movement in world space
+        this.position.add(this.velocity);
     }
 
     handleRotation(keys, deltaX, deltaY) {
@@ -70,10 +68,10 @@ class Spaceship extends THREE.Mesh {
         if (keys.a) this.rotationVelocity.y += this.rotationAcceleration;
         if (keys.d) this.rotationVelocity.y -= this.rotationAcceleration;
 
-        // Apply rotation damping
-        this.rotationVelocity.multiplyScalar(this.damping * 0.95);
+        // Apply rotation damping only
+        this.rotationVelocity.multiplyScalar(this.rotationDamping);
         
-        // Apply keyboard rotation
+        // Apply rotations
         this.rotateY(this.rotationVelocity.y);
 
         // Mouse-aimed rotation
