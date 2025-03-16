@@ -249,12 +249,12 @@ function animate() {
             Velocity: ${spaceship.velocity.length().toFixed(2)} m/s<br>
             Position:<br>
             ${spaceship.position.toArray().map((v, i) => 
-                ${['X', 'Y', 'Z'][i]}: ${v.toFixed(1)}
+                `${['X', 'Y', 'Z'][i]}: ${v.toFixed(1)}`
             ).join('<br>')}
             <br>Rotation:<br>
             ${[spaceship.rotation.x, spaceship.rotation.y, spaceship.rotation.z]
                 .map((v, i) => 
-                    ${['X', 'Y', 'Z'][i]}: ${typeof v === 'number' ? v.toFixed(2) : '0.00'}
+                    `${['X', 'Y', 'Z'][i]}: ${typeof v === 'number' ? v.toFixed(2) : '0.00'}`
                 ).join('<br>')}
         `;
     }
