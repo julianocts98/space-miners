@@ -45,22 +45,28 @@ camera.position.set(0, 2, -10);
 camera.lookAt(spaceship.position);
 
 // Movement variables
-const moveSpeed = 0.1;
-const rotationSpeed = 0.02;
 const keys = { w: false, a: false, s: false, d: false };
+let velocity = new THREE.Vector3();
+let rotationVelocity = new THREE.Vector3();
+const maxSpeed = 0.5;
+const acceleration = 0.02;
+const rotationAcceleration = 0.0008;
+const damping = 0.98;
 
 
 // Event listeners
 window.addEventListener('keydown', (e) => {
-    if (['w', 'a', 's', 'd'].includes(e.key)) {
-        keys[e.key] = true;
-    }
+    if (e.key === 'w') keys.w = true;
+    if (e.key === 's') keys.s = true;
+    if (e.key === 'a') keys.a = true;
+    if (e.key === 'd') keys.d = true;
 });
 
 window.addEventListener('keyup', (e) => {
-    if (['w', 'a', 's', 'd'].includes(e.key)) {
-        keys[e.key] = false;
-    }
+    if (e.key === 'w') keys.w = false;
+    if (e.key === 's') keys.s = false;
+    if (e.key === 'a') keys.a = false;
+    if (e.key === 'd') keys.d = false;
 });
 
 window.addEventListener('mousemove', (e) => {
@@ -115,24 +121,42 @@ function animate() {
     
     console.log('Animation frame running');
 
-    // Spaceship movement
-    if (keys.w) spaceship.translateZ(-moveSpeed);
-    if (keys.s) spaceship.translateZ(moveSpeed);
-    if (keys.a) spaceship.translateX(-moveSpeed);
-    if (keys.d) spaceship.translateX(moveSpeed);
+    // Physics-based movement
+    if (keys.w) velocity.z -= acceleration;
+    if (keys.s) velocity.z += acceleration * 0.5; // Less powerful for braking
+    if (keys.a) rotationVelocity.y += rotationAcceleration;
+    if (keys.d) rotationVelocity.y -= rotationAcceleration;
 
-    // Spaceship rotation based on mouse
+    // Apply velocity damping
+    velocity.multiplyScalar(damping);
+    rotationVelocity.multiplyScalar(damping * 0.95);
+
+    // Clamp maximum speed
+    if (velocity.length() > maxSpeed) {
+        velocity.normalize().multiplyScalar(maxSpeed);
+    }
+
+    // Apply movement and rotation
+    spaceship.translateZ(velocity.z);
+    spaceship.rotateY(rotationVelocity.y);
+
+    // Mouse-aimed rotation
     if (mouseLocked) {
-        const sensitivity = 0.002;
-        spaceship.rotation.y -= deltaX * sensitivity;
-        spaceship.rotation.x -= deltaY * sensitivity;
-        spaceship.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, spaceship.rotation.x));
+        const aimSensitivity = 0.002;
+        const targetQuaternion = new THREE.Quaternion()
+            .setFromEuler(new THREE.Euler(
+                -deltaY * aimSensitivity,
+                -deltaX * aimSensitivity,
+                0,
+                'XYZ'
+            ));
+        spaceship.quaternion.slerp(targetQuaternion, 0.3);
         deltaX = 0;
         deltaY = 0;
     }
 
-    // Camera follow
-    const offset = new THREE.Vector3(0, 2, 10);
+    // Adjust camera position to show crosshair above spaceship
+    const offset = new THREE.Vector3(0, 3, 10); // Increased Y value
     offset.applyQuaternion(spaceship.quaternion);
     camera.position.copy(spaceship.position).add(offset);
     camera.lookAt(spaceship.position);
