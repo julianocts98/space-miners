@@ -35,121 +35,6 @@ const stars = new THREE.Points(starGeometry, starMaterial);
 scene.add(stars);
 console.log('Stars added:', stars);
 
-// Spaceship class definition
-class Spaceship extends THREE.Mesh {
-    constructor() {
-        const geometry = new THREE.BoxGeometry(2, 1, 3);
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-        super(geometry, material);
-        
-        this.velocity = new THREE.Vector3();
-        this.rotationVelocity = new THREE.Vector3();
-        
-        // Add debug vectors
-        this.velocityArrow = new THREE.ArrowHelper(
-            new THREE.Vector3(0, 0, 1),
-            this.position,
-            5,
-            0xff0000,
-            0.5,
-            0.3
-        );
-        this.forwardArrow = new THREE.ArrowHelper(
-            new THREE.Vector3(0, 0, 1),
-            this.position,
-            3,
-            0x00ff00,
-            0.5,
-            0.3
-        );
-        this.velocityArrow.visible = false;
-        this.forwardArrow.visible = false;
-        this.maxSpeed = 2.0;  // Increased from 0.5
-        this.acceleration = 0.04;  // Increased from 0.02
-        this.rotationAcceleration = 0.0008;
-        this.damping = 1.0;  // Changed from 0.98 (no friction in space)
-        this.rotationDamping = 0.95;  // New separate rotation damping
-    }
-
-    handleMovement(keys) {
-        // Get forward vector based on current orientation
-        const forward = new THREE.Vector3(0, 0, -1);
-        forward.applyQuaternion(this.quaternion);
-
-        // Apply thrust in direction ship is facing (FIXED DIRECTIONS)
-        if (keys.w) {
-            this.velocity.add(forward.multiplyScalar(this.acceleration)); // Removed negative
-        }
-        if (keys.s) {  // Braking/reverse thrust
-            this.velocity.add(forward.multiplyScalar(-this.acceleration * 0.3)); // Added negative
-        }
-
-        // Clamp maximum speed
-        if (this.velocity.length() > this.maxSpeed) {
-            this.velocity.normalize().multiplyScalar(this.maxSpeed);
-        }
-
-        // Apply movement
-        this.position.add(this.velocity);
-    }
-
-    handleRotation(keys, deltaX, deltaY) {
-        // Keyboard rotation (existing code)
-        if (keys.a) this.rotationVelocity.y += this.rotationAcceleration;
-        if (keys.d) this.rotationVelocity.y -= this.rotationAcceleration;
-        this.rotationVelocity.multiplyScalar(this.rotationDamping);
-        this.rotateY(this.rotationVelocity.y);
-
-        // New mouse-based rotation system
-        if (mouseLocked) {
-            const sensitivity = 0.002;
-            const minVertical = -Math.PI/3;
-            const maxVertical = Math.PI/3;
-            
-            // Create rotation quaternion from mouse movement
-            const deltaQuaternion = new THREE.Quaternion()
-                .setFromEuler(new THREE.Euler(
-                    -deltaY * sensitivity, // Pitch (vertical)
-                    -deltaX * sensitivity, // Yaw (horizontal)
-                    0,                     // Roll (we'll keep this at 0)
-                    'YXZ'                  // Rotation order: Yaw first, then Pitch
-                ));
-            
-            // Apply the rotation directly to current orientation
-            this.quaternion.multiply(deltaQuaternion);
-            
-            // Clamp vertical rotation
-            const currentEuler = new THREE.Euler().setFromQuaternion(this.quaternion, 'YXZ');
-            currentEuler.x = THREE.MathUtils.clamp(currentEuler.x, minVertical, maxVertical);
-            this.quaternion.setFromEuler(currentEuler);
-        }
-    }
-
-    updateCamera(camera) {
-        const offset = new THREE.Vector3(0, 3, 10);
-        offset.applyQuaternion(this.quaternion);
-        camera.position.copy(this.position).add(offset);
-        camera.lookAt(this.position);
-    }
-    
-    updateDebugVectors() {
-        // Update velocity arrow
-        const velLength = this.velocity.length();
-        if (velLength > 0) {
-            this.velocityArrow.setDirection(this.velocity.clone().normalize());
-            this.velocityArrow.setLength(velLength * 2);
-        } else {
-            this.velocityArrow.setLength(0); // Hide arrow when stationary
-        }
-        this.velocityArrow.position.copy(this.position);
-
-        // Update forward arrow
-        const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.quaternion);
-        this.forwardArrow.setDirection(forward.normalize());
-        this.forwardArrow.setLength(3);
-        this.forwardArrow.position.copy(this.position);
-    }
-}
 
 // Create and add spaceship
 const spaceship = new Spaceship();
@@ -240,7 +125,7 @@ function animate() {
     if (paused) return;
 
     spaceship.handleMovement(keys);
-    spaceship.handleRotation(keys, deltaX, deltaY);
+    spaceship.handleRotation(keys, deltaX, deltaY, mouseLocked);
     spaceship.updateCamera(camera);
     
     if (debugMode) {
