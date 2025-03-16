@@ -5,6 +5,8 @@ console.log('THREE.js version:', THREE.REVISION);
 document.addEventListener('DOMContentLoaded', () => {
     let mouseLocked = false;
     let paused = false;
+    let debugMode = false;
+    const debugInfo = document.getElementById('debugInfo');
     const menu = document.getElementById('menu');
     const resumeBtn = document.getElementById('resumeBtn');
     const quitBtn = document.getElementById('quitBtn');
@@ -40,8 +42,28 @@ class Spaceship extends THREE.Mesh {
         const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
         super(geometry, material);
         
-        this.velocity = new THREE.Vector3(0, 0, 0);
+        this.velocity = new THREE.Vector3();
         this.rotationVelocity = new THREE.Vector3();
+        
+        // Add debug vectors
+        this.velocityArrow = new THREE.ArrowHelper(
+            new THREE.Vector3(0, 0, 1),
+            this.position,
+            5,
+            0xff0000,
+            0.5,
+            0.3
+        );
+        this.forwardArrow = new THREE.ArrowHelper(
+            new THREE.Vector3(0, 0, 1),
+            this.position,
+            3,
+            0x00ff00,
+            0.5,
+            0.3
+        );
+        this.velocityArrow.visible = false;
+        this.forwardArrow.visible = false;
         this.maxSpeed = 2.0;  // Increased from 0.5
         this.acceleration = 0.04;  // Increased from 0.02
         this.rotationAcceleration = 0.0008;
@@ -109,11 +131,26 @@ class Spaceship extends THREE.Mesh {
         camera.position.copy(this.position).add(offset);
         camera.lookAt(this.position);
     }
+    
+    updateDebugVectors() {
+        // Update velocity arrow
+        this.velocityArrow.setDirection(this.velocity.clone().normalize());
+        this.velocityArrow.setLength(this.velocity.length() * 2);
+        this.velocityArrow.position.copy(this.position);
+
+        // Update forward arrow
+        const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.quaternion);
+        this.forwardArrow.setDirection(forward);
+        this.forwardArrow.setLength(3);
+        this.forwardArrow.position.copy(this.position);
+    }
 }
 
 // Create and add spaceship
 const spaceship = new Spaceship();
 scene.add(spaceship);
+scene.add(spaceship.velocityArrow);
+scene.add(spaceship.forwardArrow);
 console.log('Spaceship added:', spaceship);
 
 // Position camera behind spaceship
@@ -130,6 +167,13 @@ window.addEventListener('keydown', (e) => {
     if (e.key === 's') keys.s = true;
     if (e.key === 'a') keys.a = true;
     if (e.key === 'd') keys.d = true;
+    
+    if (e.key === 'm') {
+        debugMode = !debugMode;
+        debugInfo.style.display = debugMode ? 'block' : 'none';
+        spaceship.velocityArrow.visible = debugMode;
+        spaceship.forwardArrow.visible = debugMode;
+    }
 });
 
 window.addEventListener('keyup', (e) => {
@@ -192,6 +236,15 @@ function animate() {
     spaceship.handleMovement(keys);
     spaceship.handleRotation(keys, deltaX, deltaY);
     spaceship.updateCamera(camera);
+    
+    if (debugMode) {
+        spaceship.updateDebugVectors();
+        debugInfo.innerHTML = `
+            Velocity: ${spaceship.velocity.length().toFixed(2)} m/s<br>
+            Position: ${spaceship.position.toArray().map(v => v.toFixed(1)).join(', ')}<br>
+            Rotation: ${spaceship.rotation.toArray().map(v => v.toFixed(2)).join(', ')}
+        `;
+    }
     
     // Keep mouse deltas until next frame
     deltaX *= 0.3;  // Add slight persistence
