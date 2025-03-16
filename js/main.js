@@ -40,7 +40,7 @@ class Spaceship extends THREE.Mesh {
         const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
         super(geometry, material);
         
-        this.velocity = new THREE.Vector3();
+        this.velocity = new THREE.Vector3(0, 0, 0);
         this.rotationVelocity = new THREE.Vector3();
         this.maxSpeed = 2.0;  // Increased from 0.5
         this.acceleration = 0.04;  // Increased from 0.02
@@ -50,16 +50,24 @@ class Spaceship extends THREE.Mesh {
     }
 
     handleMovement(keys) {
-        // Physics-based movement
-        if (keys.w) this.velocity.z -= this.acceleration;
-        if (keys.s) this.velocity.z += this.acceleration * 0.5;
+        // Get forward vector based on current orientation
+        const forward = new THREE.Vector3(0, 0, -1);
+        forward.applyQuaternion(this.quaternion);
 
-        // Clamp maximum speed using actual velocity vector
-        if (this.velocity.lengthSq() > this.maxSpeed * this.maxSpeed) {
+        // Apply thrust in direction ship is facing
+        if (keys.w) {
+            this.velocity.add(forward.multiplyScalar(-this.acceleration));
+        }
+        if (keys.s) {  // Braking/reverse thrust
+            this.velocity.add(forward.multiplyScalar(this.acceleration * 0.3));
+        }
+
+        // Clamp maximum speed
+        if (this.velocity.length() > this.maxSpeed) {
             this.velocity.normalize().multiplyScalar(this.maxSpeed);
         }
 
-        // Apply movement in world space
+        // Apply movement
         this.position.add(this.velocity);
     }
 
