@@ -248,7 +248,8 @@ function animate() {
         debugInfo.innerHTML = `
             Velocity: ${spaceship.velocity.length().toFixed(2)} m/s<br>
             Position: ${spaceship.position.toArray().map(v => v.toFixed(1)).join(', ')}<br>
-            Rotation: ${spaceship.rotation.toArray().map(v => v.toFixed(2)).join(', ')}
+            Rotation: ${[spaceship.rotation.x, spaceship.rotation.y, spaceship.rotation.z]
+                .map(v => typeof v === 'number' ? v.toFixed(2) : '0.00').join(', ')}
         `;
     }
     
