@@ -247,9 +247,15 @@ function animate() {
         spaceship.updateDebugVectors();
         debugInfo.innerHTML = `
             Velocity: ${spaceship.velocity.length().toFixed(2)} m/s<br>
-            Position: ${spaceship.position.toArray().map(v => v.toFixed(1)).join(', ')}<br>
-            Rotation: ${[spaceship.rotation.x, spaceship.rotation.y, spaceship.rotation.z]
-                .map(v => typeof v === 'number' ? v.toFixed(2) : '0.00').join(', ')}
+            Position:<br>
+            ${spaceship.position.toArray().map((v, i) => 
+                ${['X', 'Y', 'Z'][i]}: ${v.toFixed(1)}
+            ).join('<br>')}
+            <br>Rotation:<br>
+            ${[spaceship.rotation.x, spaceship.rotation.y, spaceship.rotation.z]
+                .map((v, i) => 
+                    ${['X', 'Y', 'Z'][i]}: ${typeof v === 'number' ? v.toFixed(2) : '0.00'}
+                ).join('<br>')}
         `;
     }
     
