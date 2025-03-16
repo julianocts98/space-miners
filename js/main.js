@@ -134,13 +134,18 @@ class Spaceship extends THREE.Mesh {
     
     updateDebugVectors() {
         // Update velocity arrow
-        this.velocityArrow.setDirection(this.velocity.clone().normalize());
-        this.velocityArrow.setLength(this.velocity.length() * 2);
+        const velLength = this.velocity.length();
+        if (velLength > 0) {
+            this.velocityArrow.setDirection(this.velocity.clone().normalize());
+            this.velocityArrow.setLength(velLength * 2);
+        } else {
+            this.velocityArrow.setLength(0); // Hide arrow when stationary
+        }
         this.velocityArrow.position.copy(this.position);
 
         // Update forward arrow
         const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.quaternion);
-        this.forwardArrow.setDirection(forward);
+        this.forwardArrow.setDirection(forward.normalize());
         this.forwardArrow.setLength(3);
         this.forwardArrow.position.copy(this.position);
     }
@@ -169,6 +174,7 @@ window.addEventListener('keydown', (e) => {
     if (e.key === 'd') keys.d = true;
     
     if (e.key === 'm') {
+        e.preventDefault(); // Add this line
         debugMode = !debugMode;
         debugInfo.style.display = debugMode ? 'block' : 'none';
         spaceship.velocityArrow.visible = debugMode;
