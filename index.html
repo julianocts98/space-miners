@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Space Adventure</title>
     <style>
-        body { margin: 0; }
+        body { margin: 0; overflow: hidden; }
         canvas { display: block; }
-        /* Add these */
-        .crosshair { cursor: crosshair; }
+        /* Add this */
+        #crosshair {
+            color: white;
+            text-shadow: 0 0 3px black;
+            font-size: 24px;
+        }
         #menu {
             display: none;
             position: fixed;
@@ -27,6 +31,16 @@
     </style>
 </head>
 <body>
+    <div id="crosshair" style="
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 24px;
+        pointer-events: none;
+        display: none;
+    ">+</div>
     <div id="menu">
         <h2>PAUSED</h2>
         <button id="resumeBtn">Resume</button>

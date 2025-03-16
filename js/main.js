@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const menu = document.getElementById('menu');
     const resumeBtn = document.getElementById('resumeBtn');
     const quitBtn = document.getElementById('quitBtn');
+    const crosshair = document.getElementById('crosshair');
+    let deltaX = 0, deltaY = 0;
     
     // Scene setup
 const scene = new THREE.Scene();
@@ -47,9 +49,6 @@ const moveSpeed = 0.1;
 const rotationSpeed = 0.02;
 const keys = { w: false, a: false, s: false, d: false };
 
-// Mouse movement tracking
-const mouse = new THREE.Vector2();
-const targetRotation = new THREE.Vector2();
 
 // Event listeners
 window.addEventListener('keydown', (e) => {
@@ -66,24 +65,34 @@ window.addEventListener('keyup', (e) => {
 
 window.addEventListener('mousemove', (e) => {
     if (!mouseLocked) return;
-    mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    deltaX += e.movementX;
+    deltaY += e.movementY;
 });
 
-// Add these event listeners after the existing ones
+// Pointer lock controls
 renderer.domElement.addEventListener('click', () => {
     if (!mouseLocked && !paused) {
-        mouseLocked = true;
-        document.body.classList.add('crosshair');
+        renderer.domElement.requestPointerLock();
     }
+});
+
+// Pointer lock change handlers
+document.addEventListener('pointerlockchange', () => {
+    mouseLocked = document.pointerLockElement === renderer.domElement;
+    crosshair.style.display = mouseLocked ? 'block' : 'none';
+    document.body.style.cursor = 'none';
+});
+
+document.addEventListener('pointerlockerror', () => {
+    console.error('Pointer lock failed');
 });
 
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
+        document.exitPointerLock();
         paused = true;
         mouseLocked = false;
         menu.style.display = 'block';
-        document.body.classList.remove('crosshair');
     }
 });
 
@@ -113,10 +122,14 @@ function animate() {
     if (keys.d) spaceship.translateX(moveSpeed);
 
     // Spaceship rotation based on mouse
-    targetRotation.x = mouse.x * Math.PI / 4;
-    targetRotation.y = mouse.y * Math.PI / 4;
-    spaceship.rotation.y += (targetRotation.x - spaceship.rotation.y) * rotationSpeed;
-    spaceship.rotation.x += (targetRotation.y - spaceship.rotation.x) * rotationSpeed;
+    if (mouseLocked) {
+        const sensitivity = 0.002;
+        spaceship.rotation.y -= deltaX * sensitivity;
+        spaceship.rotation.x -= deltaY * sensitivity;
+        spaceship.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, spaceship.rotation.x));
+        deltaX = 0;
+        deltaY = 0;
+    }
 
     // Camera follow
     const offset = new THREE.Vector3(0, 2, 10);
