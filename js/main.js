@@ -64,27 +64,34 @@ class Spaceship extends THREE.Mesh {
     }
 
     handleRotation(keys, deltaX, deltaY) {
-        // Keyboard rotation
+        // Keyboard rotation (existing code)
         if (keys.a) this.rotationVelocity.y += this.rotationAcceleration;
         if (keys.d) this.rotationVelocity.y -= this.rotationAcceleration;
-
-        // Apply rotation damping only
         this.rotationVelocity.multiplyScalar(this.rotationDamping);
-        
-        // Apply rotations
         this.rotateY(this.rotationVelocity.y);
 
-        // Mouse-aimed rotation
-        if (deltaX !== 0 || deltaY !== 0) {
-            const aimSensitivity = 0.002;
-            const targetQuaternion = new THREE.Quaternion()
+        // New mouse-based rotation system
+        if (mouseLocked) {
+            const sensitivity = 0.002;
+            const minVertical = -Math.PI/3;
+            const maxVertical = Math.PI/3;
+            
+            // Create rotation quaternion from mouse movement
+            const deltaQuaternion = new THREE.Quaternion()
                 .setFromEuler(new THREE.Euler(
-                    -deltaY * aimSensitivity,
-                    -deltaX * aimSensitivity,
-                    0,
-                    'XYZ'
+                    -deltaY * sensitivity, // Pitch (vertical)
+                    -deltaX * sensitivity, // Yaw (horizontal)
+                    0,                     // Roll (we'll keep this at 0)
+                    'YXZ'                  // Rotation order: Yaw first, then Pitch
                 ));
-            this.quaternion.slerp(targetQuaternion, 0.3);
+            
+            // Apply the rotation directly to current orientation
+            this.quaternion.multiply(deltaQuaternion);
+            
+            // Clamp vertical rotation
+            const currentEuler = new THREE.Euler().setFromQuaternion(this.quaternion, 'YXZ');
+            currentEuler.x = THREE.MathUtils.clamp(currentEuler.x, minVertical, maxVertical);
+            this.quaternion.setFromEuler(currentEuler);
         }
     }
 
@@ -126,8 +133,8 @@ window.addEventListener('keyup', (e) => {
 
 window.addEventListener('mousemove', (e) => {
     if (!mouseLocked) return;
-    deltaX += e.movementX;
-    deltaY += e.movementY;
+    deltaX = e.movementX;  // Direct assignment instead of +=
+    deltaY = e.movementY;  // for immediate response
 });
 
 // Pointer lock controls
@@ -173,17 +180,15 @@ function animate() {
     requestAnimationFrame(animate);
     
     if (paused) return;
-    
-    console.log('Animation frame running');
 
     spaceship.handleMovement(keys);
     spaceship.handleRotation(keys, deltaX, deltaY);
     spaceship.updateCamera(camera);
     
-    // Reset mouse deltas
-    deltaX = 0;
-    deltaY = 0;
-
+    // Keep mouse deltas until next frame
+    deltaX *= 0.3;  // Add slight persistence
+    deltaY *= 0.3;  // for smoother movement
+    
     renderer.render(scene, camera);
 }
 
