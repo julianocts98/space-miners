@@ -154,7 +154,7 @@ function animate() {
     if (paused) return;
 
     spaceship.handleMovement(keys);
-    spaceship.handleRotation(keys, mouseLocked, crosshairOffsetX, crosshairOffsetY);
+    spaceship.handleRotation(keys, mouseLocked, crosshairOffsetX, crosshairOffsetY, maxCrosshairOffset);
     spaceship.updateCamera(camera);
     
     if (debugMode) {
