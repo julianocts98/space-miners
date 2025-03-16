@@ -54,12 +54,12 @@ class Spaceship extends THREE.Mesh {
         const forward = new THREE.Vector3(0, 0, -1);
         forward.applyQuaternion(this.quaternion);
 
-        // Apply thrust in direction ship is facing
+        // Apply thrust in direction ship is facing (FIXED DIRECTIONS)
         if (keys.w) {
-            this.velocity.add(forward.multiplyScalar(-this.acceleration));
+            this.velocity.add(forward.multiplyScalar(this.acceleration)); // Removed negative
         }
         if (keys.s) {  // Braking/reverse thrust
-            this.velocity.add(forward.multiplyScalar(this.acceleration * 0.3));
+            this.velocity.add(forward.multiplyScalar(-this.acceleration * 0.3)); // Added negative
         }
 
         // Clamp maximum speed
