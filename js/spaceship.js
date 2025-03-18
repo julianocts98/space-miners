@@ -4,10 +4,9 @@ class Spaceship extends THREE.Group {
         
         // Main body (central fuselage)
         const mainBody = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.8, 0.4, 3, 8),
+            new THREE.BoxGeometry(0.8, 0.8, 3),  // Width, height, depth (now aligned with Z-axis)
             new THREE.MeshBasicMaterial({ color: 0xff4444 })
         );
-        mainBody.rotation.z = Math.PI/2; // Rotate to horizontal position
         this.add(mainBody);
 
         // Left thruster
