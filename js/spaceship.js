@@ -1,12 +1,46 @@
 class Spaceship extends THREE.Mesh {
     constructor() {
-        const geometry = new THREE.BoxGeometry(2, 1, 3);
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-        super(geometry, material);
+        // Create parent group instead of simple box
+        super(new THREE.Group(), new THREE.MeshBasicMaterial());
         
+        // Main body (central fuselage)
+        const mainBody = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.8, 0.4, 3, 8),
+            new THREE.MeshBasicMaterial({ color: 0xff4444 })
+        );
+        mainBody.rotation.z = Math.PI/2; // Rotate to horizontal position
+        this.add(mainBody);
+
+        // Left thruster
+        const leftThruster = new THREE.Mesh(
+            new THREE.BoxGeometry(0.6, 0.6, 2),
+            new THREE.MeshBasicMaterial({ color: 0x4444ff })
+        );
+        leftThruster.translateX(-1.2);
+        leftThruster.translateZ(0.5);
+        this.add(leftThruster);
+
+        // Right thruster
+        const rightThruster = new THREE.Mesh(
+            new THREE.BoxGeometry(0.6, 0.6, 2),
+            new THREE.MeshBasicMaterial({ color: 0x4444ff })
+        );
+        rightThruster.translateX(1.2);
+        rightThruster.translateZ(0.5);
+        this.add(rightThruster);
+
+        // Add wing-like extensions
+        const wings = new THREE.Mesh(
+            new THREE.BoxGeometry(3, 0.2, 1.5),
+            new THREE.MeshBasicMaterial({ color: 0x888888 })
+        );
+        wings.translateZ(-0.5);
+        this.add(wings);
+
+        // Keep existing physics and debug properties
         this.velocity = new THREE.Vector3();
         this.rotationVelocity = new THREE.Vector3();
-        this.maxRotationSpeed = 0.02; // Added maximum rotation speed
+        this.maxRotationSpeed = 0.02;
         
         // Add debug vectors
         this.velocityArrow = new THREE.ArrowHelper(
