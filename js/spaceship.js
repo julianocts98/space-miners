@@ -1,7 +1,6 @@
-class Spaceship extends THREE.Mesh {
+class Spaceship extends THREE.Group {
     constructor() {
-        // Create parent group instead of simple box
-        super(new THREE.Group(), new THREE.MeshBasicMaterial());
+        super();
         
         // Main body (central fuselage)
         const mainBody = new THREE.Mesh(
